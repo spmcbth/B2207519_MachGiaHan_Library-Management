@@ -34,7 +34,6 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
       <div class="col" v-for="publisher in publishers" :key="publisher._id">
         <div class="card h-100 info-card">
-
           <div class="card-body p-3">
             <h5 class="card-title">{{ publisher.tenNXB }}</h5>
             <p class="card-text small mb-2">
@@ -45,7 +44,9 @@
             </p>
             <p class="card-text small mb-2">
               <strong>Số sách:</strong>
-              <span class="badge bg-primary">{{ getPublisherBookCount(publisher._id) }}</span>
+              <span class="badge bg-primary">{{
+                getPublisherBookCount(publisher._id)
+              }}</span>
             </p>
           </div>
           <div class="card-footer p-3">
