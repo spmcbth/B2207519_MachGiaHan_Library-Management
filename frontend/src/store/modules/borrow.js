@@ -7,6 +7,10 @@ export default {
   state: {
     borrowRequests: [],     // Danh sách các yêu cầu mượn sách (cho admin)
     borrowHistory: [],      // Lịch sử mượn sách (cho người dùng)
+    penaltyStatistics: {},  // Thống kê phạt
+    overdueReturns: [],     // Danh sách trả sách trễ
+    currentOverdueBooks: [], // **THÊM MỚI** - Sách đang quá hạn
+    libraryStatistics: {},  // **THÊM MỚI** - Thống kê tổng quan
     loading: false,         // Cờ kiểm soát trạng thái loading
     error: null             // Biến lưu trữ thông báo lỗi
   },
@@ -14,19 +18,31 @@ export default {
   // MUTATIONS - Các hàm thay đổi trực tiếp state
   mutations: {
     SET_BORROW_REQUESTS(state, requests) {
-      state.borrowRequests = requests;  // Gán danh sách yêu cầu mượn vào state
+      state.borrowRequests = requests;
     },
     SET_BORROW_HISTORY(state, history) {
-      state.borrowHistory = history;    // Gán lịch sử mượn vào state
+      state.borrowHistory = history;
+    },
+    SET_PENALTY_STATISTICS(state, statistics) {
+      state.penaltyStatistics = statistics;
+    },
+    SET_OVERDUE_RETURNS(state, returns) {
+      state.overdueReturns = returns;
+    },
+    SET_CURRENT_OVERDUE_BOOKS(state, books) { // **THÊM MỚI**
+      state.currentOverdueBooks = books;
+    },
+    SET_LIBRARY_STATISTICS(state, statistics) { // **THÊM MỚI**
+      state.libraryStatistics = statistics;
     },
     SET_LOADING(state, status) {
-      state.loading = status;           // Cập nhật trạng thái loading
+      state.loading = status;
     },
     SET_ERROR(state, error) {
-      state.error = error;              // Cập nhật thông báo lỗi
+      state.error = error;
     },
     CLEAR_ERROR(state) {
-      state.error = null;               // Xóa lỗi hiện tại
+      state.error = null;
     }
   },
 
@@ -34,24 +50,20 @@ export default {
   actions: {
     // Lấy tất cả yêu cầu mượn sách (chỉ dành cho admin)
     async fetchBorrowRequests({ commit }) {
-      commit('SET_LOADING', true); // Bắt đầu loading
+      commit('SET_LOADING', true);
       try {
         const response = await api.get('/muonsach/admin/requests');
-
-        // Làm sạch dữ liệu để tránh lỗi khi truy cập các trường có thể null
         const cleanedData = response.data.map(request => ({
           ...request,
           maDocGia: request.maDocGia || { hoLot: 'N/A', ten: '', maDocGia: 'N/A' },
           maSach: request.maSach || { tenSach: 'N/A', maSach: 'N/A' }
         }));
-
-        commit('SET_BORROW_REQUESTS', cleanedData); // Gán dữ liệu sau xử lý vào state
+        commit('SET_BORROW_REQUESTS', cleanedData);
       } catch (error) {
-        // Nếu lỗi, cập nhật lỗi trong state
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra');
-        throw error; // Ném lỗi để component có thể xử lý tiếp
+        throw error;
       } finally {
-        commit('SET_LOADING', false); // Kết thúc loading
+        commit('SET_LOADING', false);
       }
     },
 
@@ -60,7 +72,7 @@ export default {
       commit('SET_LOADING', true);
       try {
         const response = await api.get('/muonsach/history');
-        commit('SET_BORROW_HISTORY', response.data); // Cập nhật vào state
+        commit('SET_BORROW_HISTORY', response.data);
       } catch (error) {
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra');
         throw error;
@@ -73,9 +85,8 @@ export default {
     async createBorrowRequest({ commit }, bookId) {
       commit('SET_LOADING', true);
       try {
-        // Gửi dữ liệu mã sách lên server
         const response = await api.post('/muonsach/request', { maSach: bookId });
-        return response.data; // Trả về dữ liệu nếu cần xử lý tiếp trong component
+        return response.data;
       } catch (error) {
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra');
         throw error;
@@ -98,7 +109,63 @@ export default {
       }
     },
 
-    // Hàm xóa lỗi để reset khi cần (thường dùng sau khi hiển thị thông báo)
+    // **THÊM MỚI** - Lấy thống kê phạt
+    async fetchPenaltyStatistics({ commit }) {
+      commit('SET_LOADING', true);
+      try {
+        const response = await api.get('/muonsach/admin/penalty-statistics');
+        commit('SET_PENALTY_STATISTICS', response.data);
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra');
+        throw error;
+      } finally {
+        commit('SET_LOADING', false);
+      }
+    },
+
+    // **THÊM MỚI** - Lấy danh sách trả sách trễ
+    async fetchOverdueReturns({ commit }) {
+      commit('SET_LOADING', true);
+      try {
+        const response = await api.get('/muonsach/admin/overdue-returns');
+        commit('SET_OVERDUE_RETURNS', response.data);
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra');
+        throw error;
+      } finally {
+        commit('SET_LOADING', false);
+      }
+    },
+
+    // **THÊM MỚI** - Lấy danh sách sách đang quá hạn
+    async fetchCurrentOverdueBooks({ commit }) {
+      commit('SET_LOADING', true);
+      try {
+        const response = await api.get('/muonsach/admin/current-overdue');
+        commit('SET_CURRENT_OVERDUE_BOOKS', response.data);
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra');
+        throw error;
+      } finally {
+        commit('SET_LOADING', false);
+      }
+    },
+
+    // **THÊM MỚI** - Lấy thống kê tổng quan thư viện
+    async fetchLibraryStatistics({ commit }) {
+      commit('SET_LOADING', true);
+      try {
+        const response = await api.get('/muonsach/admin/library-statistics');
+        commit('SET_LIBRARY_STATISTICS', response.data);
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra');
+        throw error;
+      } finally {
+        commit('SET_LOADING', false);
+      }
+    },
+
+    // Hàm xóa lỗi
     clearError({ commit }) {
       commit('CLEAR_ERROR');
     }
@@ -106,9 +173,13 @@ export default {
 
   // GETTERS - Các hàm lấy dữ liệu từ state
   getters: {
-    allBorrowRequests: state => state.borrowRequests, // Lấy tất cả yêu cầu mượn
-    borrowHistory: state => state.borrowHistory,       // Lấy lịch sử mượn sách
-    isLoading: state => state.loading,                 // Trạng thái loading hiện tại
-    error: state => state.error                        // Lỗi hiện tại
+    allBorrowRequests: state => state.borrowRequests,
+    borrowHistory: state => state.borrowHistory,
+    penaltyStatistics: state => state.penaltyStatistics,
+    overdueReturns: state => state.overdueReturns,
+    currentOverdueBooks: state => state.currentOverdueBooks, // **THÊM MỚI**
+    libraryStatistics: state => state.libraryStatistics,     // **THÊM MỚI**
+    isLoading: state => state.loading,
+    error: state => state.error
   }
 };

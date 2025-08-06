@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const NhanVien = require('./app/models/NhanVien');
+const NhanVien = require('./models/NhanVien');
 
 
 const createAdmin = async () => {

@@ -2,16 +2,16 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const connectDB = require('./app/config/db');
+const connectDB = require('./config/db');
 
 // Import routes
-const authRoutes = require('./app/routes/authRoutes');
-const sachRoutes = require('./app/routes/bookRoutes');
-const nhaXuatBanRoutes = require('./app/routes/publisherRoutes');
-const theoDoiMuonSachRoutes = require('./app/routes/borrowRoutes');
-const nhanVienRoutes = require('./app/routes/staffRoutes');
-const docGiaRoutes = require('./app/routes/userRoutes');
-const tacGiaRoutes = require('./app/routes/authorRoutes');
+const authRoutes = require('./routes/authRoutes');
+const sachRoutes = require('./routes/bookRoutes');
+const nhaXuatBanRoutes = require('./routes/publisherRoutes');
+const theoDoiMuonSachRoutes = require('./routes/borrowRoutes');
+const nhanVienRoutes = require('./routes/staffRoutes');
+const docGiaRoutes = require('./routes/userRoutes');
+const tacGiaRoutes = require('./routes/authorRoutes');
 
 const app = express();
 

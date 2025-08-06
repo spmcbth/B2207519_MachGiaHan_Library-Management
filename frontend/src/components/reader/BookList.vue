@@ -68,38 +68,39 @@
     </div>
 
     <!-- Danh sách sách -->
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
       <div class="col" v-for="book in books" :key="book._id">
-        <div class="card h-100">
-          <div class="card-img-top" style="height: 200px; overflow: hidden">
+        <div class="card h-100 book-card">
+          <div class="card-img-container">
             <img
               :src="`${API_URL}/${
                 book.imagePath || 'uploads/default-book.jpg'
               }`"
-              style="width: 100%; height: 100%; object-fit: cover"
+              class="card-img-top"
               alt="Book cover"
+              @error="handleImageError"
             />
           </div>
-          <div class="card-body">
-            <h5 class="card-title">{{ book.tenSach }}</h5>
-            <p class="card-text">
-              <small class="text-muted">Mã sách: {{ book.maSach }}</small>
+          <div class="card-body p-3">
+            <h6 class="card-title">{{ book.tenSach }}</h6>
+            <p class="card-text small mb-1">
+              <span class="text-muted">{{ book.maSach }}</span>
             </p>
-            <p class="card-text">
-              <strong>Nhà xuất bản:</strong> {{ book.maNXB?.tenNXB }}
+            <p class="card-text small mb-1">
+              <strong>NXB:</strong> {{ book.maNXB?.tenNXB || "N/A" }}
             </p>
-            <p class="card-text">
-              <strong>Năm xuất bản:</strong> {{ book.namXuatBan }}
+            <p class="card-text small mb-1">
+              <strong>Năm:</strong> {{ book.namXuatBan }}
             </p>
-            <p class="card-text">
+            <p class="card-text small mb-1">
               <strong>Tác giả:</strong>
-              {{ book.maTacGia?.tenTacGia || "Chưa có tác giả" }}
+              {{ book.maTacGia?.tenTacGia || "Chưa có" }}
             </p>
-            <p class="card-text">
-              <strong>Nguồn gốc:</strong> {{ book.nguonGoc }}
+            <p class="card-text small mb-1">
+              <strong>Nguồn:</strong> {{ book.nguonGoc }}
             </p>
-            <p class="card-text">
-              <strong>Số quyển còn:</strong>
+            <p class="card-text small mb-2">
+              <strong>Còn:</strong>
               <span
                 :class="{
                   'text-danger fw-bold': book.soQuyen === 0,
@@ -109,14 +110,14 @@
                 >{{ book.soQuyen }}</span
               >
               <br />
-              <small class="text-muted" v-if="book.soQuyen < 3">
-                {{ book.soQuyen === 0 ? "Hết sách" : "Sắp hết sách" }}
+              <small class="text-muted status-text" v-if="book.soQuyen < 3">
+                {{ book.soQuyen === 0 ? "Hết sách" : "Sắp hết" }}
               </small>
             </p>
           </div>
-          <div class="card-footer">
+          <div class="card-footer p-3">
             <button
-              class="btn btn-primary"
+              class="btn btn-primary btn-sm w-100"
               @click="borrowBook(book._id)"
               :disabled="book.soQuyen === 0 || loading"
             >
@@ -218,6 +219,10 @@ export default {
       store.commit("book/SET_ERROR", null);
     };
 
+    const handleImageError = (event) => {
+      event.target.src = `${API_URL}/uploads/default-book.jpg`;
+    };
+
     onMounted(fetchBooks);
 
     return {
@@ -231,6 +236,7 @@ export default {
       handleConfirmBorrow,
       selectedBook,
       clearError,
+      handleImageError,
       API_URL,
     };
   },
@@ -238,24 +244,79 @@ export default {
 </script>
 
 <style scoped>
-.card-title {
-  font-size: 1.1rem;
+.book-card {
+  max-width: 280px;
+  margin: 0 auto;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 8px;
+  overflow: hidden;
 }
+
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-img-container {
+  height: 200px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.book-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-text {
+  line-height: 1.3;
+}
+
+.card-text strong {
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
 .card-footer {
   background-color: transparent;
-  border-top: none;
-  padding-top: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
+
 .input-group {
   max-width: 500px;
 }
+
 .input-group-text {
   background-color: white;
   border-left: none;
 }
+
 .form-control:focus + .input-group-text {
   border-color: #86b7fe;
 }
+
 .form-control {
   border-right: none;
   border-radius: 6px;
@@ -263,37 +324,53 @@ export default {
   transition: border-color 0.2s ease;
   font-size: 0.95rem;
 }
+
 .form-control:focus {
   border-color: #4fc3f7;
   box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.1);
   outline: none;
 }
+
 .text-danger {
   font-weight: bold;
   background-color: rgba(244, 67, 54, 0.1);
   color: #d32f2f !important;
 }
+
 .text-warning {
   background-color: rgba(255, 193, 7, 0.12);
   color: #f57c00 !important;
 }
+
 .text-success {
   color: #2e7d32 !important;
 }
+
 .text-muted {
-  font-size: 0.85em;
-  font-style: italic;
-  color: #78909c;
+  color: #6c757d !important;
 }
+
+.status-text {
+  font-size: 0.7rem;
+  font-style: italic;
+}
+
 .btn-primary {
   background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
   border: none;
   font-weight: 500;
-  padding: 8px 16px;
   transition: all 0.2s ease;
   border-radius: 6px;
+  font-size: 0.9rem;
+  padding: 8px 16px;
 }
-.btn-primary:hover {
-  background: #29b6f6;
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #29b6f6 0%, #0288d1 100%);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
 }
 </style>

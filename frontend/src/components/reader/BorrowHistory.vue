@@ -14,6 +14,22 @@
       <button type="button" class="btn-close" @click="clearError"></button>
     </div>
 
+    <!-- Tổng quan phạt của người dùng -->
+    <div class="row mb-4" v-if="penaltySummary.totalPenalty > 0">
+      <div class="col-md-12">
+        <div class="alert alert-warning">
+          <h5>
+            <i class="fas fa-exclamation-triangle"></i> Tổng tiền phạt của bạn
+          </h5>
+          <p class="mb-0">
+            <strong>{{ formatCurrency(penaltySummary.totalPenalty) }}</strong>
+            ({{ penaltySummary.totalOverdueReturns }} lần trả trễ, trung bình
+            {{ penaltySummary.avgLateDays.toFixed(1) }} ngày/lần)
+          </p>
+        </div>
+      </div>
+    </div>
+
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="input-group">
@@ -72,6 +88,17 @@
           >Đã trả</a
         >
       </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentTab === 'overdue' }"
+          @click="currentTab = 'overdue'"
+          >Trả trễ
+          <span class="badge bg-danger ms-1" v-if="overdueCount > 0">{{
+            overdueCount
+          }}</span>
+        </a>
+      </li>
     </ul>
 
     <!-- Danh sách yêu cầu mượn sách -->
@@ -81,10 +108,26 @@
           <tr>
             <th>Sách</th>
             <th>Ngày mượn</th>
-            <th v-if="currentTab === 'all' || currentTab === 'returned'">
+            <th>Ngày hẹn trả</th>
+            <th
+              v-if="
+                currentTab === 'all' ||
+                currentTab === 'returned' ||
+                currentTab === 'overdue'
+              "
+            >
               Ngày trả
             </th>
             <th>Trạng thái</th>
+            <th
+              v-if="
+                currentTab === 'all' ||
+                currentTab === 'returned' ||
+                currentTab === 'overdue'
+              "
+            >
+              Phạt
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -96,13 +139,45 @@
               >
             </td>
             <td>{{ formatDate(request.ngayMuon) }}</td>
-            <td v-if="currentTab === 'all' || currentTab === 'returned'">
+            <td>
+              {{ formatDate(request.ngayHenTra) }}
+              <span
+                v-if="isOverdue(request) && request.trangThai === 'Đã duyệt'"
+                class="badge bg-danger ms-1"
+                >Quá hạn</span
+              >
+            </td>
+            <td
+              v-if="
+                currentTab === 'all' ||
+                currentTab === 'returned' ||
+                currentTab === 'overdue'
+              "
+            >
               {{ request.ngayTra ? formatDate(request.ngayTra) : "-" }}
             </td>
             <td>
               <span :class="getStatusBadgeClass(request.trangThai)">{{
                 request.trangThai
               }}</span>
+            </td>
+            <td
+              v-if="
+                currentTab === 'all' ||
+                currentTab === 'returned' ||
+                currentTab === 'overdue'
+              "
+            >
+              <div v-if="request.tienPhat && request.tienPhat > 0">
+                <span class="text-danger fw-bold">{{
+                  formatCurrency(request.tienPhat)
+                }}</span
+                ><br />
+                <small class="text-muted"
+                  >{{ request.soNgayTre }} ngày trễ</small
+                >
+              </div>
+              <span v-else class="text-success">-</span>
             </td>
           </tr>
           <tr v-if="filteredRequests.length === 0">
@@ -132,6 +207,39 @@ export default {
 
     const borrowHistory = computed(() => store.getters["borrow/borrowHistory"]);
 
+    // Tính toán tổng quan phạt
+    const penaltySummary = computed(() => {
+      const overdueReturns = borrowHistory.value.filter(
+        (request) => request.trangThai === "Đã trả" && request.tienPhat > 0
+      );
+
+      const totalPenalty = overdueReturns.reduce(
+        (sum, request) => sum + (request.tienPhat || 0),
+        0
+      );
+      const totalOverdueReturns = overdueReturns.length;
+      const avgLateDays =
+        totalOverdueReturns > 0
+          ? overdueReturns.reduce(
+              (sum, request) => sum + (request.soNgayTre || 0),
+              0
+            ) / totalOverdueReturns
+          : 0;
+
+      return {
+        totalPenalty,
+        totalOverdueReturns,
+        avgLateDays,
+      };
+    });
+
+    // Đếm số lần trả trễ
+    const overdueCount = computed(() => {
+      return borrowHistory.value.filter(
+        (request) => request.trangThai === "Đã trả" && request.tienPhat > 0
+      ).length;
+    });
+
     const filteredRequests = computed(() => {
       let results = borrowHistory.value;
 
@@ -141,10 +249,18 @@ export default {
           approved: "Đã duyệt",
           rejected: "Từ chối",
           returned: "Đã trả",
+          overdue: "overdue_special", // Xử lý riêng
         };
-        results = results.filter(
-          (request) => request.trangThai === statusMap[currentTab.value]
-        );
+
+        if (currentTab.value === "overdue") {
+          results = results.filter(
+            (request) => request.trangThai === "Đã trả" && request.tienPhat > 0
+          );
+        } else {
+          results = results.filter(
+            (request) => request.trangThai === statusMap[currentTab.value]
+          );
+        }
       }
 
       if (searchTerm.value.trim()) {
@@ -160,7 +276,21 @@ export default {
     });
 
     const formatDate = (date) => {
+      if (!date) return "N/A";
       return new Date(date).toLocaleDateString("vi-VN");
+    };
+
+    const formatCurrency = (value) => {
+      if (!value) return "0 ₫";
+      return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      }).format(value);
+    };
+
+    const isOverdue = (request) => {
+      if (!request.ngayHenTra || request.trangThai !== "Đã duyệt") return false;
+      return new Date() > new Date(request.ngayHenTra);
     };
 
     const getStatusBadgeClass = (status) => {
@@ -191,9 +321,11 @@ export default {
     };
 
     const getColspan = computed(() => {
-      return currentTab.value === "all" || currentTab.value === "returned"
-        ? 4
-        : 3;
+      return currentTab.value === "all" ||
+        currentTab.value === "returned" ||
+        currentTab.value === "overdue"
+        ? 6
+        : 4;
     });
 
     onMounted(fetchHistory);
@@ -204,7 +336,11 @@ export default {
       loading,
       error,
       searchTerm,
+      penaltySummary,
+      overdueCount,
       formatDate,
+      formatCurrency,
+      isOverdue,
       getStatusBadgeClass,
       clearError,
       getColspan,
@@ -316,5 +452,13 @@ export default {
 }
 .btn-primary:hover {
   background: #29b6f6;
+}
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffecb3;
+  color: #856404;
+}
+.fw-bold {
+  font-weight: bold !important;
 }
 </style>
