@@ -42,11 +42,6 @@
             <button type="button" class="alert-close" @click="clearError">
               ×
             </button>
-            <div v-if="loginAttempts >= 5" class="forgot-link-container">
-              <router-link to="/forgot-password" class="forgot-link"
-                >Quên mật khẩu? Nhấn vào đây để đổi mật khẩu.</router-link
-              >
-            </div>
           </div>
 
           <!-- MSNV cho nhân viên -->
@@ -477,20 +472,6 @@ export default {
   font-size: 1.2rem;
   cursor: pointer;
   font-weight: bold;
-}
-
-.forgot-link-container {
-  margin-top: 10px;
-}
-
-.forgot-link {
-  color: #4fc3f7;
-  text-decoration: none;
-  font-size: 0.85rem;
-}
-
-.forgot-link:hover {
-  color: #29b6f6;
 }
 
 .btn-login {

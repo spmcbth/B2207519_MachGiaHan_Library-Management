@@ -293,9 +293,9 @@ export default {
       errors,
       loading,
       error,
-      clearError, //
-      clearMessage, //
-      message, //
+      clearError, 
+      clearMessage,
+      message, 
       handleUpdateProfile,
       cancelUpdate,
       showPasswordMessage,
