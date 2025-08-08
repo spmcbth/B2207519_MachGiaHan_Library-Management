@@ -210,6 +210,12 @@
         </div>
       </div>
     </div>
+
+    <!-- Thêm phần này để hiển thị danh sách sách quá hạn -->
+    <div class="mt-5">
+      <h3 class="mb-3">Danh sách sách đang quá hạn</h3>
+      <OverdueBook />
+    </div>
   </div>
 </template>
 
@@ -218,11 +224,13 @@ import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { showError } from "@/utils/notifications";
+import OverdueBook from "@/components/admin/OverdueBook.vue";
 
 export default {
   name: "AdminHomePage",
   components: {
     LoadingSpinner,
+    OverdueBook,
   },
   setup() {
     const store = useStore();

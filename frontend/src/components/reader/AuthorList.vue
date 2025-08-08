@@ -41,7 +41,7 @@
               <span class="text-muted">{{ author.maTacGia }}</span>
             </p>
             <p class="card-text small mb-2">
-              <strong>Số sách:</strong>
+              <strong>Số sách: </strong>
               <span class="badge bg-primary">{{
                 getAuthorBookCount(author._id)
               }}</span>
@@ -249,9 +249,9 @@ export default {
   font-size: 0.85rem;
 }
 
-.badge {
+/* .badge {
   font-size: 0.8rem;
-}
+} */
 
 .card-footer {
   background-color: transparent;

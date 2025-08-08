@@ -15,11 +15,11 @@ const createAdmin = async () => {
     if (!adminExists) {
       const hashedPassword = await bcrypt.hash('admin123', 8);
       const admin = new NhanVien({
-        MSNV: 'ADMIN001',
+        MSNV: 'ADMIN01',
         hoTenNV: 'Admin',
         password: hashedPassword,
         chucVu: 'Admin',
-        diaChi: 'Hà Nội',
+        diaChi: 'Admin Adress',
         soDienThoai: '0123456789',
       });
       await admin.save();

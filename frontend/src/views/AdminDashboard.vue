@@ -62,6 +62,7 @@ import ReaderManagement from "@/components/admin/ReaderManagement.vue";
 import BorrowManagement from "@/components/admin/BorrowManagement.vue";
 import AuthorManagement from "@/components/admin/AuthorManagement.vue";
 import AdminHomePage from "@/components/admin/AdminHomePage.vue";
+import OverdueBook from "@/components/admin/OverdueBook.vue";
 
 const navItems = [
   { label: "Quản lý sách", component: "BookManagement" },
@@ -82,6 +83,7 @@ export default {
     BorrowManagement,
     AuthorManagement,
     AdminHomePage,
+    OverdueBook,
   },
   setup() {
     const store = useStore();
@@ -116,13 +118,16 @@ export default {
 <style scoped>
 .custom-navbar {
   background-color: #29b6f6;
+  padding: 0.8rem 1rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .nav-link {
-  cursor: pointer;
-  font-size: 1.05rem;
   color: white !important;
+  font-size: 1.05rem;
+  font-weight: 500;
   transition: color 0.2s ease;
+  cursor: pointer;
 }
 
 .nav-link:hover {
@@ -130,8 +135,14 @@ export default {
 }
 
 .navbar-brand {
-  font-size: 1.4rem;
   font-weight: bold;
-  color: white !important;
+  font-size: 1.4rem;
+  color: #ffffff !important;
+}
+
+.navbar-nav .nav-link.active {
+  font-weight: 700;
+  border-bottom: 2px solid #ffffff;
+  padding-bottom: 2px;
 }
 </style>

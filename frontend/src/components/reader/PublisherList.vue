@@ -43,7 +43,7 @@
               <strong>Địa chỉ:</strong> {{ publisher.diaChi }}
             </p>
             <p class="card-text small mb-2">
-              <strong>Số sách:</strong>
+              <strong>Số sách: </strong>
               <span class="badge bg-primary">{{
                 getPublisherBookCount(publisher._id)
               }}</span>
@@ -261,7 +261,6 @@ export default {
   line-height: 1.3;
   margin-bottom: 0.5rem;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   color: #1565c0;
@@ -271,9 +270,9 @@ export default {
   font-size: 0.85rem;
 }
 
-.badge {
+/* .badge {
   font-size: 0.8rem;
-}
+} */
 
 .card-footer {
   background-color: transparent;

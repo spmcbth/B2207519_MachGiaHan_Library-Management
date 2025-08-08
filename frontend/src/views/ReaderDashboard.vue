@@ -7,7 +7,7 @@
           href="#"
           @click.prevent="currentComponent = 'HomePage'"
         >
-          <i class="fas fa-book-reader me-2"></i>Thư viện sách
+          <i class="fas fa-book-open me-2"></i>Thư viện sách
         </a>
         <button
           class="navbar-toggler"
@@ -91,28 +91,31 @@
           </p>
         </div>
         <div class="col-md-4 mb-4">
-          <h5>Liên kết nhanh</h5>
+          <h5>Chính sách bảo mật</h5>
           <ul class="list-unstyled">
             <li>
-              <a href="#" @click.prevent="navigateTo('BookList')"
-                >Danh sách sách</a
-              >
+              <a href="#">
+                Chính sách quyền riêng tư
+              </a>
             </li>
             <li>
-              <a href="#" @click.prevent="navigateTo('PublisherList')"
-                >Nhà xuất bản</a
-              >
+              <a href="#">
+                Điều khoản sử dụng
+              </a>
             </li>
             <li>
-              <a href="#" @click.prevent="navigateTo('AuthorList')">Tác giả</a>
+              <a href="#">
+                Bảo mật & bảo vệ dữ liệu
+              </a>
             </li>
             <li>
-              <a href="#" @click.prevent="navigateTo('BorrowHistory')"
-                >Lịch sử mượn sách</a
-              >
+              <a href="#">
+                Chính sách Cookie
+              </a>
             </li>
           </ul>
         </div>
+        
         <div class="col-md-4 mb-4">
           <h5>Liên hệ</h5>
           <ul class="list-unstyled">
@@ -138,8 +141,7 @@
       <div class="row">
         <div class="col-md-12 text-center">
           <p class="mb-0">
-            &copy; B2207519 - {{ currentYear }} Hệ thống Quản lý Thư viện. All rights
-            reserved.
+            &copy; Hệ thống Thư viện trực tuyến. All rights reserved.
           </p>
         </div>
       </div>

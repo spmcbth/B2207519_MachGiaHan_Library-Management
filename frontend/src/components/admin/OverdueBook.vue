@@ -97,14 +97,14 @@
             </td>
             <td>
               <button
-                class="btn btn-sm btn-success me-2"
+                class="btn btn-sm btn-info me-2"
                 @click="markAsReturned(book._id)"
                 :disabled="loading"
               >
-                <i class="fas fa-check"></i> Đánh dấu đã trả
+                <i class="fas fa-undo"></i> Đánh dấu đã trả
               </button>
               <button
-                class="btn btn-sm btn-info"
+                class="btn btn-sm btn-warning"
                 @click="sendReminder(book)"
                 :disabled="loading"
               >
@@ -368,21 +368,18 @@ Thư viện`;
 
 .table {
   font-size: 0.95rem;
+  border-collapse: collapse;
 }
-
 .table thead th {
-  background-color: #f8f9fa;
-  color: #495057;
+  background-color: #e1f5fe;
+  color: #0277bd;
   font-weight: 600;
   vertical-align: middle;
   padding: 12px;
-  border-bottom: 2px solid #dee2e6;
 }
-
 .table-striped > tbody > tr:nth-child(odd) {
   background-color: #f8fbfc;
 }
-
 .btn-sm {
   padding: 4px 8px;
   font-size: 0.875rem;
